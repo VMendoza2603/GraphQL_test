@@ -1,0 +1,23 @@
+# Obtener todos los usuarios
+query ObtenerUsuarios {
+  usuarios {
+    id
+    name
+    email
+    age
+    createdAt
+    updatedAt
+  }
+}
+
+# Obtener un usuario por ID
+query ObtenerUsuario($id: ID!) {
+  usuario(id: $id) {
+    id
+    name
+    email
+    age
+    createdAt
+    updatedAt
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "crearUsuario": {
+    "data": {
+      "name": "Juan Pérez",
+      "email": "juan@ejemplo.com",
+      "age": 30
+    }
+  },
+  "actualizarUsuario": {
+    "id": "ID_DEL_USUARIO_AQUI",
+    "data": {
+      "name": "Juan Actualizado",
+      "email": "juan.nuevo@ejemplo.com",
+      "age": 31
+    }
+  },
+  "eliminarUsuario": {
+    "id": "ID_DEL_USUARIO_AQUI"
+  },
+  "obtenerUsuario": {
+    "id": "ID_DEL_USUARIO_AQUI"
+  }
+}
