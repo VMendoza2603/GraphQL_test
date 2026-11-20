@@ -1,12 +1,16 @@
-# Obtener todos los usuarios
+# Lista paginada con búsqueda, filtro por rol y orden
 query ObtenerUsuarios {
-  usuarios {
-    id
-    name
-    email
-    age
-    createdAt
-    updatedAt
+  usuarios(page: 1, limit: 5, search: "ana", role: ESTUDIANTE, orderBy: NOMBRE) {
+    total
+    page
+    totalPages
+    items {
+      id
+      name
+      email
+      age
+      role
+    }
   }
 }
 
@@ -17,7 +21,19 @@ query ObtenerUsuario($id: ID!) {
     name
     email
     age
+    role
     createdAt
-    updatedAt
+  }
+}
+
+# Estadísticas generales
+query Estadisticas {
+  estadisticas {
+    total
+    edadPromedio
+    porRol {
+      role
+      total
+    }
   }
 }

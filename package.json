@@ -1,23 +1,43 @@
 {
-  "name": "graphql-api",
+  "name": "graphql-usuarios-api",
   "version": "1.0.0",
-  "description": "GraphQL API con Node.js, TypeScript, Apollo Server y Mongoose",
+  "description": "API GraphQL con Apollo Server 5, Express, TypeScript y MongoDB",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "seed": "tsx src/seed.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
-    "@apollo/server": "^4.11.0",
+    "@apollo/server": "^5.5.2",
+    "@as-integrations/express5": "^1.1.2",
+    "cors": "^2.8.6",
     "dotenv": "^16.4.5",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.5",
     "graphql": "^16.9.0",
-    "graphql-tag": "^2.12.6",
-    "mongoose": "^9.7.3"
+    "helmet": "^8.3.0",
+    "mongoose": "^9.7.3",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/node": "^22.9.0",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.6.3"
+    "@types/supertest": "^7.2.1",
+    "mongodb-memory-server": "^11.3.0",
+    "supertest": "^7.3.2",
+    "tsx": "^4.23.15",
+    "typescript": "^5.6.3",
+    "vitest": "^5.1.1"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "overrides": {
+    "@graphql-tools/utils": "^12.1.0"
   }
 }

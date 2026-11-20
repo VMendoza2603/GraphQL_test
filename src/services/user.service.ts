@@ -1,67 +1,52 @@
-import { UserData } from "../interfaces/IUserRepository";
-import { IUserRepository } from "../interfaces/IUserRepository";
-import { IUserService, CreateUserInput, UpdateUserInput } from "../interfaces/IUserService";
 import { AppError } from "../errors/AppError";
 import { ErrorCodes } from "../errors/errorCodes";
-import {
-  validateCreateUserInput,
-  validateUpdateUserInput,
-} from "../validations/user.validation";
+import { UserRepository, UserData, UserPage, UserStats } from "../repositories/user.repository";
+import { createUserSchema, listUsersSchema, objectId, parse, updateUserSchema } from "./user.validation";
 
-export class UserService implements IUserService {
-  constructor(private readonly userRepository: IUserRepository) {}
+const notFound = (id: string) => new AppError(`Usuario con id '${id}' no encontrado`, ErrorCodes.USER_NOT_FOUND, 404);
+const duplicated = (email: string) =>
+  new AppError(`Ya existe un usuario con el email '${email}'`, ErrorCodes.USER_ALREADY_EXISTS, 409);
 
-  async findAll(): Promise<UserData[]> {
-    return this.userRepository.findAll();
+export class UserService {
+  constructor(private readonly repo: UserRepository = new UserRepository()) {}
+
+  list(args: unknown): Promise<UserPage> {
+    return this.repo.findPage(parse(listUsersSchema, args ?? {}));
   }
 
-  async findById(id: string): Promise<UserData> {
-    const user = await this.userRepository.findById(id);
-    if (!user) {
-      throw new AppError(
-        `Usuario con id '${id}' no encontrado`,
-        ErrorCodes.USER_NOT_FOUND,
-        404
-      );
-    }
+  async findById(rawId: string): Promise<UserData> {
+    const id = parse(objectId, rawId);
+    const user = await this.repo.findById(id);
+    if (!user) throw notFound(id);
     return user;
   }
 
-  async create(data: CreateUserInput): Promise<UserData> {
-    validateCreateUserInput(data);
-
-    const existing = await this.userRepository.findByEmail(data.email);
-    if (existing) {
-      throw new AppError(
-        `Ya existe un usuario con el email '${data.email}'`,
-        ErrorCodes.USER_ALREADY_EXISTS,
-        409
-      );
-    }
-
-    return this.userRepository.create(data);
+  async create(input: unknown): Promise<UserData> {
+    const data = parse(createUserSchema, input);
+    if (await this.repo.findByEmail(data.email)) throw duplicated(data.email);
+    return this.repo.create(data);
   }
 
-  async update(id: string, data: UpdateUserInput): Promise<UserData> {
-    await this.findById(id);
-    validateUpdateUserInput(data);
-
+  async update(rawId: string, input: unknown): Promise<UserData> {
+    const id = parse(objectId, rawId);
+    const data = parse(updateUserSchema, input);
     if (data.email) {
-      const existing = await this.userRepository.findByEmail(data.email);
-      if (existing && existing.id !== id) {
-        throw new AppError(
-          `Ya existe un usuario con el email '${data.email}'`,
-          ErrorCodes.USER_ALREADY_EXISTS,
-          409
-        );
-      }
+      const existing = await this.repo.findByEmail(data.email);
+      if (existing && existing.id !== id) throw duplicated(data.email);
     }
-
-    return this.userRepository.update(id, data);
+    const user = await this.repo.update(id, data);
+    if (!user) throw notFound(id);
+    return user;
   }
 
-  async delete(id: string): Promise<UserData> {
-    await this.findById(id);
-    return this.userRepository.delete(id);
+  async delete(rawId: string): Promise<UserData> {
+    const id = parse(objectId, rawId);
+    const user = await this.repo.delete(id);
+    if (!user) throw notFound(id);
+    return user;
+  }
+
+  stats(): Promise<UserStats> {
+    return this.repo.stats();
   }
 }

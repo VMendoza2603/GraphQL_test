@@ -1,31 +1,15 @@
-import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
-import { schema } from "./graphql/schema";
-import { createContext } from "./graphql/context";
-import { env } from "./config/env";
-import { connectDatabase } from "./lib/database";
+// Arranque local: npm run dev / npm start (en Vercel se usa src/app.ts)
+import app from "./app";
+import { env, validateEnv } from "./config/env";
+import { connectDatabase } from "./database/connection";
 
 async function main() {
+  validateEnv();
   await connectDatabase();
-
-  const server = new ApolloServer({
-    typeDefs: schema.typeDefs,
-    resolvers: schema.resolvers,
-    formatError: (formattedError) => {
-      return {
-        message: formattedError.message,
-        code: formattedError.extensions?.code || "INTERNAL_ERROR",
-        statusCode: formattedError.extensions?.statusCode || 500,
-      };
-    },
-  });
-
-  const { url } = await startStandaloneServer(server, {
-    context: createContext,
-    listen: { port: env.port },
-  });
-
-  console.log(`Servidor listo en ${url}`);
+  app.listen(env.port, () => console.log(`API GraphQL lista en http://localhost:${env.port}/graphql`));
 }
 
-main().catch(console.error);
+main().catch((error) => {
+  console.error("No se pudo iniciar el servidor:", error.message);
+  process.exit(1);
+});

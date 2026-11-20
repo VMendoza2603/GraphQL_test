@@ -1,33 +1,21 @@
-# Crear un usuario
-mutation CrearUsuario($data: CreateUserInput!) {
-  crearUsuario(data: $data) {
+mutation CrearUsuario {
+  crearUsuario(data: { name: "Rosa Chávez", email: "rosa.chavez@universidad.edu.ec", age: 30, role: DOCENTE }) {
     id
     name
-    email
-    age
-    createdAt
-    updatedAt
+    role
   }
 }
 
-# Actualizar un usuario
-mutation ActualizarUsuario($id: ID!, $data: UpdateUserInput!) {
-  actualizarUsuario(id: $id, data: $data) {
+mutation ActualizarUsuario($id: ID!) {
+  actualizarUsuario(id: $id, data: { age: 31 }) {
     id
-    name
-    email
     age
-    createdAt
-    updatedAt
   }
 }
 
-# Eliminar un usuario
 mutation EliminarUsuario($id: ID!) {
   eliminarUsuario(id: $id) {
     id
     name
-    email
-    age
   }
 }
